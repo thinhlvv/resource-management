@@ -6,6 +6,9 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/thinhlvv/resource-management/config"
+	"github.com/thinhlvv/resource-management/handler/user"
+	"github.com/thinhlvv/resource-management/model"
+	"github.com/thinhlvv/resource-management/pkg"
 )
 
 func main() {
@@ -17,7 +20,24 @@ func main() {
 	db.SetMaxIdleConns(5)
 	db.SetConnMaxLifetime(time.Hour)
 
+	// signer
+	signer := config.MustInitJWTSigner(cfg)
+	requestValidator := pkg.NewRequestValidator()
+
+	// app
+	app := model.App{
+		DB:               db,
+		RequestValidator: requestValidator,
+		JWTSigner:        signer,
+	}
+
 	e := echo.New()
+
+	// User service
+	{
+		userHandler := user.New(app)
+		userHandler.RegisterHTTPRouter(e)
+	}
 
 	s := &http.Server{
 		Addr:         cfg.Server.Port,

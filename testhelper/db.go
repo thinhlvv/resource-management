@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/thinhlvv/blog-system/config"
+	"github.com/thinhlvv/resource-management/config"
 )
 
 // NewDB returns db to test.

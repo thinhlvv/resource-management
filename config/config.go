@@ -15,6 +15,10 @@ type Config struct {
 		ReadTimeout  int    `envconfig:"SERVER_READ_TIMEOUT" default:"300"`
 		WriteTimeout int    `envconfig:"SERVER_WRITE_TIMEOUT" default:"300"`
 	}
+	JWT struct {
+		Secret   string        `envconfig:"JWT_SECRET" required:"true"`
+		Duration time.Duration `envconfig:"" default:"168h"`
+	}
 	Mysql struct {
 		Name     string `envconfig:"DB_NAME" required:"true"`
 		User     string `envconfig:"DB_USER" required:"true"`
