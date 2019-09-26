@@ -13,6 +13,8 @@ import (
 var (
 	// ErrInvalidAuthorizationHeader ...
 	ErrInvalidAuthorizationHeader = errors.New("invalid authorization header")
+	// ErrInvalidRole is response error when invalid role access function.
+	ErrInvalidRole = errors.New("role is invalid to access")
 )
 
 // Authorizer represents all middleware interface related to Authentication.
@@ -60,9 +62,40 @@ func (a *authorizer) Authenticate() echo.MiddlewareFunc {
 }
 
 func (a *authorizer) ValidateWithRoles(validRoles []int) echo.MiddlewareFunc {
-	return func(echo.HandlerFunc) echo.HandlerFunc {
+	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
-			return nil
+			auth := c.Request().Header.Get("Authorization")
+
+			values := strings.Split(auth, " ")
+			if len(values) != 2 {
+				return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, ErrInvalidAuthorizationHeader))
+			}
+			bearer := values[0]
+			if !strings.EqualFold(bearer, "Bearer") {
+				return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, ErrInvalidAuthorizationHeader))
+			}
+			token := values[1]
+			claims, err := a.signer.Verify(token)
+			if err != nil {
+				return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
+			}
+
+			isValidRole := false
+			for _, validRole := range validRoles {
+				if claims.Role == validRole {
+					isValidRole = true
+					break
+				}
+			}
+
+			if !isValidRole {
+				return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, ErrInvalidRole))
+			}
+
+			// Populate the context and inject them back into the header.
+			c = model.ContextWithUserID(c, claims.StandardClaims.Subject)
+			c = model.ContextWithRole(c, claims.Role)
+			return next(c)
 		}
 	}
 }
