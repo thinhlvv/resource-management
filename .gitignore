@@ -14,3 +14,9 @@
 # vim stuffs
 *.swo
 *.swp
+
+# local database
+tmp
+
+# env
+.env

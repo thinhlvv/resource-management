@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  db: 
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_NAME}
+      MYSQL_ROOT_PASSWORD: '${DB_PASS}'
+      MYSQL_USER: ${DB_USER}
+      MYSQL_PASSWORD: '${DB_PASS}'
+    ports:
+      - '${DB_HOST}:3306'
+    volumes:
+      - ./tmp/mysql:/var/lib/mysql
+
+  db_test: 
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_DATABASE: ${DB_TEST_NAME}
+      MYSQL_ROOT_PASSWORD: '${DB_TEST_PASS}'
+      MYSQL_USER: ${DB_TEST_USER}
+      MYSQL_PASSWORD: '${DB_TEST_PASS}'
+    ports:
+      - '${DB_TEST_HOST}:3306'
+    volumes:
+      - ./tmp/mysql_test:/var/lib/mysql
