@@ -23,11 +23,11 @@ jobs:
             make install 
       - run:
           name: run migrations
-          command: GO111MODULE=on make migrate-dbtest
+          command: make migrate-dbtest
       - run:
           name: run test
           command: |
-            GO111MODULE=on make test
+            make test
             $GOPATH/bin/goveralls -coverprofile=/go/src/github.com/thinhlvv/resource-management/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
   
 workflows:
