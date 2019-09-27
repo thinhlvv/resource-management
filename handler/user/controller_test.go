@@ -90,9 +90,19 @@ func TestControllerCreateArticle(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(rec.Code, ShouldEqual, http.StatusBadRequest)
 		})
+		Convey("signup controller failed with empty JSON", func() {
+			req := httptest.NewRequest(http.MethodPost, "/user/signup", strings.NewReader(""))
+			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
+			rec := httptest.NewRecorder()
+			c := e.NewContext(req, rec)
 
-		Convey("login controller failed with invalid params", func() {
-			req := httptest.NewRequest(http.MethodPost, "/user/login", strings.NewReader(invalidSigninJSON))
+			err := userHandler.Signup(c)
+			So(err, ShouldBeNil)
+			So(rec.Code, ShouldEqual, http.StatusBadRequest)
+		})
+
+		Convey("login controller failed with empty JSON", func() {
+			req := httptest.NewRequest(http.MethodPost, "/user/login", strings.NewReader(""))
 			req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 			rec := httptest.NewRecorder()
 			c := e.NewContext(req, rec)
