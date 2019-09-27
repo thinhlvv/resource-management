@@ -31,8 +31,8 @@ type (
 		Email    string `json:"email" validate:"required,email" conform:"trim"`
 		Password string `json:"password" validate:"required,min=8" conform:"trim"`
 	}
-	// LoginResponse represents the response of a admin logging in.
-	LoginResponse struct {
+	// LoginResp represents the response of a admin logging in.
+	LoginResp struct {
 		AccessToken string `json:"access_token"`
 	}
 )
@@ -52,7 +52,41 @@ func (ctrl Controller) Login(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, model.NewErrorResponse(c, err))
 	}
-	return c.JSON(http.StatusOK, &LoginResponse{
+	return c.JSON(http.StatusOK, &LoginResp{
+		AccessToken: accessToken,
+	})
+}
+
+type (
+	// SignupReq ...
+	SignupReq struct {
+		Email    string `json:"email" validate:"required,email" conform:"trim"`
+		Password string `json:"password" validate:"required,min=8" conform:"trim"`
+		Role     int    `json:"role" validate:"required,min=1,max=2"`
+	}
+	// SignupResp ...
+	SignupResp struct {
+		AccessToken string `json:"access_token"`
+	}
+)
+
+// Signup returns token for user to access platform.
+func (ctrl Controller) Signup(c echo.Context) error {
+	req := SignupReq{}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
+	}
+
+	if err := ctrl.validator.ValidateStruct(req); err != nil {
+		return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
+	}
+
+	accessToken, err := ctrl.service.Signup(c, req)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, model.NewErrorResponse(c, err))
+	}
+
+	return c.JSON(http.StatusOK, &SignupResp{
 		AccessToken: accessToken,
 	})
 }
@@ -64,4 +98,5 @@ func (ctrl Controller) RegisterHTTPRouter(e *echo.Echo) {
 	userRout := e.Group("/user")
 
 	userRout.POST("/login", ctrl.Login, auth.Authenticate())
+	userRout.POST("/signup", ctrl.Signup)
 }

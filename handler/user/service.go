@@ -17,6 +17,7 @@ type (
 	// Service is interface of user service.
 	Service interface {
 		Login(ctx echo.Context, req LoginRequest) (string, error)
+		Signup(ctx echo.Context, req SignupReq) (string, error)
 	}
 	// ServiceImpl represents service implementation of service.
 	ServiceImpl struct {
@@ -35,7 +36,34 @@ func NewService(repo Repository, app model.App) Service {
 	}
 }
 
-// Login logs the admin into the dashboard.
+// Signup registers new user.
+func (s *ServiceImpl) Signup(ctx echo.Context, req SignupReq) (string, error) {
+	conform.Strings(&req)
+
+	hashedPassword, err := s.hasher.Hash(req.Password)
+	if err != nil {
+		return "", err
+	}
+
+	newUser := model.User{
+		Email:          req.Email,
+		HashedPassword: hashedPassword,
+		Role:           model.UserRole(req.Role),
+	}
+	id, err := s.repo.CreateUser(newUser)
+	if err != nil {
+		return "", err
+	}
+
+	accessToken, err := s.signer.SignWithRole(strconv.Itoa(id), newUser.Role.Int())
+	if err != nil {
+		return "", err
+	}
+
+	return accessToken, nil
+}
+
+// Login is logic of login use case.
 func (s *ServiceImpl) Login(ctx echo.Context, req LoginRequest) (string, error) {
 	conform.Strings(&req)
 
