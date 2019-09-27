@@ -3,10 +3,10 @@
 -- +goose StatementBegin
 CREATE TABLE IF NOT EXISTS user (
 	id INT UNSIGNED AUTO_INCREMENT,
-  quota INT COMMENT 'Number of resources user can manage',
+  quota INT,
 	email VARCHAR(255) UNIQUE NOT NULL,
   hashed_password VARCHAR(255) NOT NULL,
-  role int NOT NULL COMMENT '1-user, 2-admin',
+  role int NOT NULL,
 
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
 	updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
