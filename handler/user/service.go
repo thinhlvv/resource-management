@@ -49,6 +49,7 @@ func (s *ServiceImpl) Signup(ctx echo.Context, req SignupReq) (string, error) {
 		Email:          req.Email,
 		HashedPassword: hashedPassword,
 		Role:           model.UserRole(req.Role),
+		Quota:          model.UnlimitedQuota.Int(),
 	}
 	id, err := s.repo.CreateUser(newUser)
 	if err != nil {

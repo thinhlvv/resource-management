@@ -2,6 +2,17 @@ package model
 
 import "time"
 
+// Quota ...
+type Quota int
+
+// Int converts type to int
+func (q Quota) Int() int {
+	return int(q)
+}
+
+// UnlimitedQuota marks user has unlimited to create resources.
+var UnlimitedQuota Quota = -1
+
 // UserRole stricts role of user's type.
 type UserRole int
 
