@@ -6,6 +6,7 @@ import (
 
 	"github.com/labstack/echo"
 	"github.com/thinhlvv/resource-management/config"
+	"github.com/thinhlvv/resource-management/handler/resource"
 	"github.com/thinhlvv/resource-management/handler/user"
 	"github.com/thinhlvv/resource-management/model"
 	"github.com/thinhlvv/resource-management/pkg"
@@ -37,6 +38,11 @@ func main() {
 	{
 		userHandler := user.New(app)
 		userHandler.RegisterHTTPRouter(e)
+	}
+	// Resource service
+	{
+		resourceHandler := resource.New(app)
+		resourceHandler.RegisterHTTPRouter(e)
 	}
 
 	s := &http.Server{
