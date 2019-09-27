@@ -30,11 +30,11 @@ var Roles = map[UserRole]string{
 
 // User is database access model.
 type User struct {
-	ID       int
-	Quota    int
-	Email    string
-	Password string
-	Role     UserRole
+	ID             int      `json:"id"`
+	Quota          int      `json:"quota"`
+	Email          string   `json:"email"`
+	HashedPassword string   `json:"-"`
+	Role           UserRole `json:"role"`
 
 	DeletedAt *time.Time
 }

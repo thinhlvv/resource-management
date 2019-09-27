@@ -11,4 +11,5 @@ type App struct {
 	DB               *sql.DB
 	RequestValidator pkg.RequestValidator
 	JWTSigner        pkg.Signer
+	Hasher           pkg.Hasher
 }

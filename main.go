@@ -25,11 +25,15 @@ func main() {
 	signer := config.MustInitJWTSigner(cfg)
 	requestValidator := pkg.NewRequestValidator()
 
+	// hasher
+	hasher := pkg.NewHasher(pkg.NewConfig())
+
 	// app
 	app := model.App{
 		DB:               db,
 		RequestValidator: requestValidator,
 		JWTSigner:        signer,
+		Hasher:           hasher,
 	}
 
 	e := echo.New()

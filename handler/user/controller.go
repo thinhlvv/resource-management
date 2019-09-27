@@ -1,6 +1,8 @@
 package user
 
 import (
+	"net/http"
+
 	"github.com/labstack/echo"
 	"github.com/thinhlvv/resource-management/middleware"
 	"github.com/thinhlvv/resource-management/model"
@@ -9,19 +11,50 @@ import (
 
 // Controller returns endpoint handlers.
 type Controller struct {
-	signer pkg.Signer
+	service   Service
+	signer    pkg.Signer
+	validator pkg.RequestValidator
 }
 
 // NewController returns new Controller.
-func NewController(app model.App) *Controller {
+func NewController(svc Service, app model.App) *Controller {
 	return &Controller{
-		signer: app.JWTSigner,
+		signer:    app.JWTSigner,
+		service:   svc,
+		validator: app.RequestValidator,
 	}
 }
 
-// SignIn returns token for user to access platform.
-func (ctrl Controller) SignIn(e echo.Context) error {
-	return nil
+type (
+	// LoginRequest represents the request of a admin logging in.
+	LoginRequest struct {
+		Email    string `json:"email" validate:"required,email" conform:"trim"`
+		Password string `json:"password" validate:"required,min=8" conform:"trim"`
+	}
+	// LoginResponse represents the response of a admin logging in.
+	LoginResponse struct {
+		AccessToken string `json:"access_token"`
+	}
+)
+
+// Login returns token for user to access platform.
+func (ctrl Controller) Login(c echo.Context) error {
+	req := LoginRequest{}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
+	}
+
+	if err := ctrl.validator.ValidateStruct(req); err != nil {
+		return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
+	}
+
+	accessToken, err := ctrl.service.Login(c, req)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, model.NewErrorResponse(c, err))
+	}
+	return c.JSON(http.StatusOK, &LoginResponse{
+		AccessToken: accessToken,
+	})
 }
 
 // RegisterHTTPRouter registers HTTP endpoints.
@@ -30,5 +63,5 @@ func (ctrl Controller) RegisterHTTPRouter(e *echo.Echo) {
 
 	userRout := e.Group("/user")
 
-	userRout.POST("/login", ctrl.SignIn, auth.Authenticate())
+	userRout.POST("/login", ctrl.Login, auth.Authenticate())
 }

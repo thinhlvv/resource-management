@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS user (
 	id INT UNSIGNED AUTO_INCREMENT,
   quota INT UNSIGNED COMMENT 'Number of resources user can manage',
 	email VARCHAR(255) UNIQUE NOT NULL,
-  password VARCHAR(255) NOT NULL,
+  hashed_password VARCHAR(255) NOT NULL,
   role int NOT NULL COMMENT '1-user, 2-admin',
 
   created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
