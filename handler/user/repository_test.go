@@ -29,7 +29,7 @@ func TestRepository(t *testing.T) {
 		So(createdUser, ShouldResemble, &u)
 
 		Reset(func() {
-			testhelper.RemoveUser(db, newID)
+			testhelper.RemoveUser(db, newID, "")
 			db.Close()
 		})
 	})
