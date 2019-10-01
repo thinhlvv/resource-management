@@ -1,6 +1,9 @@
 package resource
 
 import (
+	"net/http"
+	"strconv"
+
 	"github.com/labstack/echo"
 	"github.com/thinhlvv/resource-management/middleware"
 	"github.com/thinhlvv/resource-management/model"
@@ -9,13 +12,17 @@ import (
 
 // Controller returns endpoint handlers.
 type Controller struct {
-	signer pkg.Signer
+	service   Service
+	signer    pkg.Signer
+	validator pkg.RequestValidator
 }
 
 // NewController returns new Controller.
-func NewController(app model.App) *Controller {
+func NewController(svc Service, app model.App) *Controller {
 	return &Controller{
-		signer: app.JWTSigner,
+		service:   svc,
+		signer:    app.JWTSigner,
+		validator: app.RequestValidator,
 	}
 }
 
@@ -24,9 +31,45 @@ func (ctrl Controller) GetList(e echo.Context) error {
 	return nil
 }
 
+type (
+	// CreateReq ...
+	CreateReq struct {
+		Name   string `json:"name" validate:"required,max=100"`
+		UserID int    `json:"user_id" validate:"required"`
+	}
+	// CreateRes returns info of resource.
+	CreateRes struct {
+		ID   int    `json:"id"`
+		Name string `json:"name"`
+	}
+)
+
 // Create ...
-func (ctrl Controller) Create(e echo.Context) error {
-	return nil
+func (ctrl Controller) Create(c echo.Context) error {
+	req := CreateReq{}
+	if err := c.Bind(&req); err != nil {
+		return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
+	}
+
+	userID := model.UserIDFromContext(c)
+	iUserID, err := strconv.Atoi(userID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
+	}
+	req.UserID = iUserID
+
+	if err := ctrl.validator.ValidateStruct(req); err != nil {
+		return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
+	}
+
+	resource, err := ctrl.service.CreateResource(req)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, model.NewErrorResponse(c, err))
+	}
+	return c.JSON(http.StatusOK, CreateRes{
+		ID:   resource.ID,
+		Name: resource.Name,
+	})
 }
 
 // Delete ...

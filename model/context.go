@@ -9,7 +9,6 @@ type contextKey string
 var (
 	requestIDKey contextKey = "req_id"
 	userIDKey    contextKey = "user_id"
-	localeKey    contextKey = "locale"
 	roleKey      contextKey = "role"
 )
 
