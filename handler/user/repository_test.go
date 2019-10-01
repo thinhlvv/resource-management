@@ -16,6 +16,7 @@ func TestRepository(t *testing.T) {
 		Email:          "test@gmail.com",
 		HashedPassword: "123456789",
 		Role:           model.RoleUser,
+		Quota:          model.UnlimitedQuota.Int(),
 	}
 
 	Convey("Repository Feature: User repository", t, func() {

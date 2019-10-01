@@ -1,8 +1,13 @@
 package resource
 
 import (
+	"errors"
+
 	"github.com/thinhlvv/resource-management/model"
 )
+
+// ErrNotEnoughQuota ...
+var ErrNotEnoughQuota = errors.New("You don't have enough quota to create new resource")
 
 type (
 	// Service is interface of user service.
@@ -24,6 +29,16 @@ func NewService(repo Repository) Service {
 
 // CreateResource ...
 func (svc *ServiceImpl) CreateResource(req CreateReq) (*model.Resource, error) {
+
+	// check quota
+	user, err := svc.repo.GetUserByID(req.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	if user.Quota == 0 {
+		return nil, ErrNotEnoughQuota
+	}
 
 	resource := model.Resource{
 		Name:   req.Name,
