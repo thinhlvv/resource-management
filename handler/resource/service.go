@@ -13,6 +13,7 @@ type (
 	// Service is interface of user service.
 	Service interface {
 		CreateResource(req CreateReq) (*model.Resource, error)
+		GetResourcesOfUser(userID int) ([]model.Resource, error)
 	}
 	// ServiceImpl represents service implementation of service.
 	ServiceImpl struct {
@@ -52,4 +53,14 @@ func (svc *ServiceImpl) CreateResource(req CreateReq) (*model.Resource, error) {
 	resource.ID = id
 
 	return &resource, nil
+}
+
+// GetResourcesOfUser ...
+func (svc *ServiceImpl) GetResourcesOfUser(userID int) ([]model.Resource, error) {
+	resources, err := svc.repo.GetResourcesByUserID(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	return resources, nil
 }

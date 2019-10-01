@@ -1,9 +1,9 @@
 -- +goose Up
 -- +goose StatementBegin
-CREATE TABLE IF NOT EXISTS user (
-	id INT UNSIGNED AUTO_INCREMENT,
+CREATE TABLE IF NOT EXISTS user(
+  id INT UNSIGNED AUTO_INCREMENT,
   quota INT,
-	email VARCHAR(255) UNIQUE NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
   hashed_password VARCHAR(255) NOT NULL,
   role INT NOT NULL,
   

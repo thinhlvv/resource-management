@@ -4,10 +4,10 @@ import "time"
 
 // Resource is data access model.
 type Resource struct {
-	ID        int
-	UserID    int
-	Name      string
-	CreatedAt time.Time
-	UpdatedAt time.Time
-	DeletedAt *time.Time
+	ID        int        `json:"id"`
+	UserID    int        `json:"-"`
+	Name      string     `json:"name"`
+	CreatedAt time.Time  `json:"-"`
+	UpdatedAt time.Time  `json:"-"`
+	DeletedAt *time.Time `json:"-"`
 }

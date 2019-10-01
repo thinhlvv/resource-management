@@ -27,8 +27,19 @@ func NewController(svc Service, app model.App) *Controller {
 }
 
 // GetList ...
-func (ctrl Controller) GetList(e echo.Context) error {
-	return nil
+func (ctrl Controller) GetList(c echo.Context) error {
+	userID := model.UserIDFromContext(c)
+	iUserID, err := strconv.Atoi(userID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
+	}
+
+	resources, err := ctrl.service.GetResourcesOfUser(iUserID)
+	if err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, model.NewErrorResponse(c, err))
+	}
+
+	return c.JSON(http.StatusOK, resources)
 }
 
 type (

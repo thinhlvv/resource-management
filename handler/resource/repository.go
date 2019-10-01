@@ -11,6 +11,7 @@ type (
 	Repository interface {
 		// resource
 		CreateResource(model.Resource) (int, error)
+		GetResourcesByUserID(int) ([]model.Resource, error)
 
 		// user
 		GetUserByID(int) (*model.User, error)
@@ -34,6 +35,11 @@ func (repo *RepoImpl) CreateResource(resource model.Resource) (int, error) {
 // GetUserByID find user with email.
 func (repo *RepoImpl) GetUserByID(id int) (*model.User, error) {
 	return repo.getUserByID(id)
+}
+
+// GetResourcesByUserID ...
+func (repo *RepoImpl) GetResourcesByUserID(userID int) ([]model.Resource, error) {
+	return repo.getResourcesByUserID(userID)
 }
 
 func (repo *RepoImpl) createResource(resource model.Resource) (int, error) {
@@ -72,4 +78,35 @@ func (repo *RepoImpl) getUserByID(id int) (*model.User, error) {
 	)
 
 	return &u, err
+}
+
+func (repo *RepoImpl) getResourcesByUserID(userID int) ([]model.Resource, error) {
+	stmt := `
+		SELECT
+			id,
+			name
+		FROM
+			resource
+	`
+	rows, err := repo.db.Query(stmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []model.Resource
+	for rows.Next() {
+		var resource model.Resource
+		err = rows.Scan(
+			&resource.ID,
+			&resource.Name,
+		)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, resource)
+	}
+	err = rows.Err()
+
+	return result, err
 }
