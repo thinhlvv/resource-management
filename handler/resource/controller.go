@@ -33,8 +33,9 @@ func (ctrl Controller) GetList(c echo.Context) error {
 	if err != nil {
 		return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
 	}
+	role := model.RoleFromContext(c)
 
-	resources, err := ctrl.service.GetResourcesOfUser(iUserID)
+	resources, err := ctrl.service.GetResourcesOfUser(iUserID, role)
 	if err != nil {
 		return c.JSON(http.StatusUnprocessableEntity, model.NewErrorResponse(c, err))
 	}

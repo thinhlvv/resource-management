@@ -13,7 +13,7 @@ type (
 	// Service is interface of user service.
 	Service interface {
 		CreateResource(req CreateReq) (*model.Resource, error)
-		GetResourcesOfUser(userID int) ([]model.Resource, error)
+		GetResourcesOfUser(userID, role int) ([]model.Resource, error)
 	}
 	// ServiceImpl represents service implementation of service.
 	ServiceImpl struct {
@@ -30,8 +30,6 @@ func NewService(repo Repository) Service {
 
 // CreateResource ...
 func (svc *ServiceImpl) CreateResource(req CreateReq) (*model.Resource, error) {
-
-	// check quota
 	user, err := svc.repo.GetUserByID(req.UserID)
 	if err != nil {
 		return nil, err
@@ -56,11 +54,19 @@ func (svc *ServiceImpl) CreateResource(req CreateReq) (*model.Resource, error) {
 }
 
 // GetResourcesOfUser ...
-func (svc *ServiceImpl) GetResourcesOfUser(userID int) ([]model.Resource, error) {
-	resources, err := svc.repo.GetResourcesByUserID(userID)
+func (svc *ServiceImpl) GetResourcesOfUser(userID, role int) ([]model.Resource, error) {
+	if role == model.RoleUser.Int() {
+		resources, err := svc.repo.GetResourcesByUserID(userID)
+		if err != nil {
+			return nil, err
+		}
+		return resources, nil
+	}
+
+	// GetAll
+	resources, err := svc.repo.GetAll()
 	if err != nil {
 		return nil, err
 	}
-
 	return resources, nil
 }

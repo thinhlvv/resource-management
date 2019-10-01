@@ -12,6 +12,7 @@ type (
 		// resource
 		CreateResource(model.Resource) (int, error)
 		GetResourcesByUserID(int) ([]model.Resource, error)
+		GetAll() ([]model.Resource, error)
 
 		// user
 		GetUserByID(int) (*model.User, error)
@@ -42,6 +43,11 @@ func (repo *RepoImpl) GetResourcesByUserID(userID int) ([]model.Resource, error)
 	return repo.getResourcesByUserID(userID)
 }
 
+// GetAll ...
+func (repo *RepoImpl) GetAll() ([]model.Resource, error) {
+	return repo.getAll()
+}
+
 func (repo *RepoImpl) createResource(resource model.Resource) (int, error) {
 	stmt, err := repo.db.Prepare(`
 		INSERT INTO resource(name, user_id)
@@ -64,7 +70,7 @@ func (repo *RepoImpl) getUserByID(id int) (*model.User, error) {
 	query := repo.db.QueryRow(`
 		SELECT	id, email, hashed_password, quota, role
 		FROM		user
-		WHERE		id = ?
+		WHERE		id = ? 
 		LIMIT		1
 	`, id)
 
@@ -82,11 +88,38 @@ func (repo *RepoImpl) getUserByID(id int) (*model.User, error) {
 
 func (repo *RepoImpl) getResourcesByUserID(userID int) ([]model.Resource, error) {
 	stmt := `
-		SELECT
-			id,
-			name
-		FROM
-			resource
+		SELECT		id, name
+		FROM			resource
+		WHERE			user_id = ? AND deleted_at IS NULL
+	`
+	rows, err := repo.db.Query(stmt, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	var result []model.Resource
+	for rows.Next() {
+		var resource model.Resource
+		err = rows.Scan(
+			&resource.ID,
+			&resource.Name,
+		)
+		if err != nil {
+			return nil, err
+		}
+		result = append(result, resource)
+	}
+	err = rows.Err()
+
+	return result, err
+}
+
+func (repo *RepoImpl) getAll() ([]model.Resource, error) {
+	stmt := `
+		SELECT	id, name
+		FROM		resource
+		WHERE		deleted_at IS NULL
 	`
 	rows, err := repo.db.Query(stmt)
 	if err != nil {
