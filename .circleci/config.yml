@@ -29,7 +29,7 @@ jobs:
           name: run test
           command: |
             make test
-            $GOPATH/bin/goveralls -coverprofile=/go/src/github.com/thinhlvv/resource-management/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
+            # $GOPATH/bin/goveralls -coverprofile=/go/src/github.com/thinhlvv/resource-management/coverage.out -service=circle-ci -repotoken=$COVERALLS_TOKEN
   
 workflows:
   resource-management:
