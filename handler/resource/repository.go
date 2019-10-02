@@ -13,6 +13,8 @@ type (
 		CreateResource(model.Resource) (int, error)
 		GetResourcesByUserID(int) ([]model.Resource, error)
 		GetAll() ([]model.Resource, error)
+		SoftDelete(id int) error
+		ResourceBelongsUser(resourceID, userID int) bool
 
 		// user
 		GetUserByID(int) (*model.User, error)
@@ -48,6 +50,16 @@ func (repo *RepoImpl) GetAll() ([]model.Resource, error) {
 	return repo.getAll()
 }
 
+// SoftDelete ...
+func (repo *RepoImpl) SoftDelete(id int) error {
+	return repo.softDelete(id)
+}
+
+// ResourceBelongsUser ...
+func (repo *RepoImpl) ResourceBelongsUser(resourceID, userID int) bool {
+	return repo.resourceBelongsUser(resourceID, userID)
+}
+
 func (repo *RepoImpl) createResource(resource model.Resource) (int, error) {
 	stmt, err := repo.db.Prepare(`
 		INSERT INTO resource(name, user_id)
@@ -73,7 +85,6 @@ func (repo *RepoImpl) getUserByID(id int) (*model.User, error) {
 		WHERE		id = ? 
 		LIMIT		1
 	`, id)
-
 	var u model.User
 	err := query.Scan(
 		&u.ID,
@@ -142,4 +153,40 @@ func (repo *RepoImpl) getAll() ([]model.Resource, error) {
 	err = rows.Err()
 
 	return result, err
+}
+
+func (repo *RepoImpl) softDelete(id int) error {
+	stmt, err := repo.db.Prepare(`
+		UPDATE resource
+		SET deleted_at = now() 
+		WHERE id = ?
+	`)
+	if err != nil {
+		return err
+	}
+
+	_, err = stmt.Exec(id)
+	if err != nil {
+		return err
+	}
+
+	return err
+}
+
+func (repo *RepoImpl) resourceBelongsUser(resourceID, userID int) bool {
+	query := repo.db.QueryRow(`
+		SELECT	id
+		FROM		resource
+		WHERE		id = ? AND user = ?
+		LIMIT		1
+	`, resourceID, userID)
+
+	var r model.Resource
+	if err := query.Scan(
+		&r.ID,
+	); err != nil {
+		return false
+	}
+
+	return true
 }

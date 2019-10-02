@@ -2,7 +2,9 @@ package resource
 
 import (
 	"errors"
+	"strconv"
 
+	"github.com/labstack/echo"
 	"github.com/thinhlvv/resource-management/model"
 )
 
@@ -14,6 +16,7 @@ type (
 	Service interface {
 		CreateResource(req CreateReq) (*model.Resource, error)
 		GetResourcesOfUser(userID, role int) ([]model.Resource, error)
+		SoftDeleteResource(ctx echo.Context, resourceID int) error
 	}
 	// ServiceImpl represents service implementation of service.
 	ServiceImpl struct {
@@ -69,4 +72,22 @@ func (svc *ServiceImpl) GetResourcesOfUser(userID, role int) ([]model.Resource, 
 		return nil, err
 	}
 	return resources, nil
+}
+
+// SoftDeleteResource ...
+func (svc *ServiceImpl) SoftDeleteResource(ctx echo.Context, resourceID int) error {
+	role := model.RoleFromContext(ctx)
+	userID := model.UserIDFromContext(ctx)
+	iUserID, err := strconv.Atoi(userID)
+	if err != nil {
+		return err
+	}
+
+	if role == model.RoleUser.Int() {
+		if !svc.repo.ResourceBelongsUser(resourceID, iUserID) {
+			return errors.New("you are not owner of this resource")
+		}
+	}
+
+	return svc.repo.SoftDelete(resourceID)
 }

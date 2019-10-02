@@ -85,8 +85,18 @@ func (ctrl Controller) Create(c echo.Context) error {
 }
 
 // Delete ...
-func (ctrl Controller) Delete(e echo.Context) error {
-	return nil
+func (ctrl Controller) Delete(c echo.Context) error {
+	// resourceID := c.Param("id")
+	// iResourceID , err := strconv.Atoi(resourceID)
+	// if err != nil {
+	// return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
+	//}
+	// role := model.RoleFromContext(c)
+
+	// if err := ctrl.service.SoftDeleteResource(c, iResourceID); err != nil {
+	// return c.JSON(http.StatusUnprocessableEntity, model.NewErrorResponse(c, err))
+	// }
+	return c.JSON(http.StatusAccepted, nil)
 }
 
 // RegisterHTTPRouter registers HTTP endpoints.
@@ -97,5 +107,5 @@ func (ctrl Controller) RegisterHTTPRouter(e *echo.Echo) {
 
 	userRout.GET("", ctrl.GetList, auth.Authenticate())
 	userRout.POST("", ctrl.Create, auth.Authenticate())
-	userRout.DELETE("", ctrl.Delete, auth.Authenticate())
+	userRout.DELETE("/:id", ctrl.Delete, auth.Authenticate())
 }
