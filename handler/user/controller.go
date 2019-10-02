@@ -196,7 +196,7 @@ func (ctrl Controller) RegisterHTTPRouter(e *echo.Echo) {
 	// admin CRUD user
 	admin := auth.ValidateWithRoles([]int{model.RoleAdmin.Int()})
 	userRout.GET("", ctrl.GetList, admin)
-	userRout.DELETE("", ctrl.Delete, admin)
+	userRout.DELETE("/:id", ctrl.Delete, admin)
 	userRout.POST("", ctrl.Create, admin)
 	userRout.PUT("/:id", ctrl.Update, admin)
 }
