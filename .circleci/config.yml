@@ -23,7 +23,8 @@ jobs:
             make install 
       - run:
           name: run migrations
-          command: make migrate-dbtest
+          command: |
+            make migrate-dbtest
       - run:
           name: run test
           command: |
