@@ -72,3 +72,10 @@ Troubleshoot:
 ```bash
 make start
 ```
+
+## Authentication
+
+Headers:
+
+  - Authorization : Bearer xxx
+  
