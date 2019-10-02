@@ -3,7 +3,7 @@ jobs:
   test:
     docker:
       - image: circleci/golang:1.12
-      - image: circleci/mysql:8.0.0
+      - image: circleci/mysql:latest
         environment:
           MYSQL_DATABASE: resource_management_test
           MYSQL_ROOT_PASSWORD: password
