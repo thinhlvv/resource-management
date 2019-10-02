@@ -86,16 +86,15 @@ func (ctrl Controller) Create(c echo.Context) error {
 
 // Delete ...
 func (ctrl Controller) Delete(c echo.Context) error {
-	// resourceID := c.Param("id")
-	// iResourceID , err := strconv.Atoi(resourceID)
-	// if err != nil {
-	// return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
-	//}
-	// role := model.RoleFromContext(c)
+	resourceID := c.Param("id")
+	iResourceID, err := strconv.Atoi(resourceID)
+	if err != nil {
+		return c.JSON(http.StatusBadRequest, model.NewErrorResponse(c, err))
+	}
 
-	// if err := ctrl.service.SoftDeleteResource(c, iResourceID); err != nil {
-	// return c.JSON(http.StatusUnprocessableEntity, model.NewErrorResponse(c, err))
-	// }
+	if err := ctrl.service.SoftDeleteResource(c, iResourceID); err != nil {
+		return c.JSON(http.StatusUnprocessableEntity, model.NewErrorResponse(c, err))
+	}
 	return c.JSON(http.StatusAccepted, nil)
 }
 

@@ -20,8 +20,8 @@ type (
 		Signup(ctx echo.Context, req SignupReq) (string, error)
 
 		// user
-		Create(model.User) (int, error)
-		Update(model.User) error
+		Create(CreateUserReq) (int, error)
+		Update(UpdateUserReq) error
 		Delete(int) error
 		GetAll() ([]model.User, error)
 	}
@@ -99,12 +99,32 @@ func (s *ServiceImpl) Login(ctx echo.Context, req LoginRequest) (string, error) 
 }
 
 // Create new user.
-func (s *ServiceImpl) Create(u model.User) (int, error) {
+func (s *ServiceImpl) Create(req CreateUserReq) (int, error) {
+	quota := model.UnlimitedQuota.Int()
+	if req.Quota != 0 {
+		quota = req.Quota
+	}
+
+	hashedPassword, err := s.hasher.Hash(req.Password)
+	if err != nil {
+		return 0, err
+	}
+
+	u := model.User{
+		Email:          req.Email,
+		Quota:          quota,
+		HashedPassword: hashedPassword,
+	}
 	return s.repo.CreateUser(u)
 }
 
 // Update user's information.
-func (s *ServiceImpl) Update(u model.User) error {
+func (s *ServiceImpl) Update(req UpdateUserReq) error {
+	u := model.User{
+		ID:    req.ID,
+		Email: req.Email,
+		Quota: req.Quota,
+	}
 	return s.repo.UpdateUser(u)
 }
 
