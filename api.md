@@ -41,7 +41,7 @@ Used to collect a Token for a registered User.
 }
 ```
 
-## Success Response
+### Success Response
 
 **Code** : `200 OK`
 
@@ -53,7 +53,7 @@ Used to collect a Token for a registered User.
 }
 ```
 
-## Error Response
+### Error Response
 
 **Condition** : If 'username' and 'password' combination is wrong.
 
@@ -90,7 +90,7 @@ New user registers.
 }
 ```
 
-## Success Response
+### Success Response
 
 **Code** : `200 OK`
 
@@ -102,7 +102,7 @@ New user registers.
 }
 ```
 
-## Error Response
+### Error Response
 
 **Condition** : If 'username' and 'password' combination is wrong.
 
@@ -141,7 +141,7 @@ Create new resource.
 }
 ```
 
-## Success Response
+### Success Response
 
 **Code** : `200 OK`
 
@@ -154,7 +154,7 @@ Create new resource.
 }
 ```
 
-## Error Response
+### Error Response
 
 **Condition** : If name is duplicated
 
@@ -165,5 +165,88 @@ Create new resource.
 ```json
 {
     "error": "sql: duplicated field name"
+}
+```
+
+
+
+
+
+
+
+
+
+### Get List Resources
+
+Get list resources.
+
+**URL** : `/resource`
+
+**Method** : `GET`
+
+**Auth required** : YES
+
+### Success Response
+
+**Code** : `200 OK`
+
+**Content example**
+
+```json
+[
+	{
+    		"id": 1,
+    		"name": "test1"
+	},
+	{
+    		"id": 2,
+    		"name": "test2"
+	}
+]
+```
+
+### Error Response
+
+**Condition** : If name is duplicated
+
+**Code** : `422 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+    "error": "sql: no rows in result set"
+}
+```
+
+
+
+
+
+### Delete Resource
+
+Delete resource.
+
+**URL** : `/resource/:id`
+
+**Method** : `DELETE`
+
+**Auth required** : YES
+
+### Success Response
+
+**Code** : `202 Accepted`
+
+### Error Response
+
+**Condition** : If is is invalid.
+
+**Code** : `400 BAD REQUEST`
+
+**Content** :
+
+```json
+{
+    "error": "sql: no rows in result set"
 }
 ```
