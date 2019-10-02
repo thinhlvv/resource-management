@@ -91,6 +91,26 @@ func (ctrl Controller) Signup(c echo.Context) error {
 	})
 }
 
+// GetList returns token for user to access platform.
+func (ctrl Controller) GetList(c echo.Context) error {
+	return c.JSON(http.StatusOK, nil)
+}
+
+// Delete returns token for user to access platform.
+func (ctrl Controller) Delete(c echo.Context) error {
+	return c.JSON(http.StatusOK, nil)
+}
+
+// Create returns token for user to access platform.
+func (ctrl Controller) Create(c echo.Context) error {
+	return c.JSON(http.StatusOK, nil)
+}
+
+// Update returns token for user to access platform.
+func (ctrl Controller) Update(c echo.Context) error {
+	return c.JSON(http.StatusOK, nil)
+}
+
 // RegisterHTTPRouter registers HTTP endpoints.
 func (ctrl Controller) RegisterHTTPRouter(e *echo.Echo) {
 	auth := middleware.NewAuthorizer(ctrl.signer)
@@ -99,4 +119,10 @@ func (ctrl Controller) RegisterHTTPRouter(e *echo.Echo) {
 
 	userRout.POST("/login", ctrl.Login, auth.Authenticate())
 	userRout.POST("/signup", ctrl.Signup)
+
+	// CRUD
+	userRout.GET("", ctrl.GetList, auth.ValidateWithRoles([]int{model.RoleAdmin.Int()}))
+	userRout.DELETE("", ctrl.Delete, auth.ValidateWithRoles([]int{model.RoleAdmin.Int()}))
+	userRout.POST("", ctrl.Create, auth.ValidateWithRoles([]int{model.RoleAdmin.Int()}))
+	userRout.PUT("/:id", ctrl.Update, auth.ValidateWithRoles([]int{model.RoleAdmin.Int()}))
 }
