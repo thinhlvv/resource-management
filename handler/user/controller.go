@@ -120,9 +120,10 @@ func (ctrl Controller) RegisterHTTPRouter(e *echo.Echo) {
 	userRout.POST("/login", ctrl.Login, auth.Authenticate())
 	userRout.POST("/signup", ctrl.Signup)
 
-	// CRUD
-	userRout.GET("", ctrl.GetList, auth.ValidateWithRoles([]int{model.RoleAdmin.Int()}))
-	userRout.DELETE("", ctrl.Delete, auth.ValidateWithRoles([]int{model.RoleAdmin.Int()}))
-	userRout.POST("", ctrl.Create, auth.ValidateWithRoles([]int{model.RoleAdmin.Int()}))
-	userRout.PUT("/:id", ctrl.Update, auth.ValidateWithRoles([]int{model.RoleAdmin.Int()}))
+	admin := auth.ValidateWithRoles([]int{model.RoleAdmin.Int()})
+	// admin CRUD user
+	userRout.GET("", ctrl.GetList, admin)
+	userRout.DELETE("", ctrl.Delete, admin)
+	userRout.POST("", ctrl.Create, admin)
+	userRout.PUT("/:id", ctrl.Update, admin)
 }

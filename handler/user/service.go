@@ -18,6 +18,12 @@ type (
 	Service interface {
 		Login(ctx echo.Context, req LoginRequest) (string, error)
 		Signup(ctx echo.Context, req SignupReq) (string, error)
+
+		// user
+		Create(model.User) (int, error)
+		Update(model.User) error
+		Delete(int) error
+		GetAll() ([]model.User, error)
 	}
 	// ServiceImpl represents service implementation of service.
 	ServiceImpl struct {
@@ -90,4 +96,24 @@ func (s *ServiceImpl) Login(ctx echo.Context, req LoginRequest) (string, error) 
 	}
 
 	return accessToken, nil
+}
+
+// Create new user.
+func (s *ServiceImpl) Create(u model.User) (int, error) {
+	return s.repo.CreateUser(u)
+}
+
+// Update user's information.
+func (s *ServiceImpl) Update(u model.User) error {
+	return s.repo.UpdateUser(u)
+}
+
+// Delete user by ID ...
+func (s *ServiceImpl) Delete(id int) error {
+	return s.repo.SoftDeleteUser(id)
+}
+
+// GetAll users.
+func (s *ServiceImpl) GetAll() ([]model.User, error) {
+	return s.repo.GetAllUser()
 }
